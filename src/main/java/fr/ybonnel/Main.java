@@ -19,6 +19,9 @@ package fr.ybonnel;
 
 import fr.ybonnel.simpleweb4j.handlers.RouteParameters;
 import fr.ybonnel.simpleweb4j.handlers.websocket.WebSocketListener;
+import fr.ybonnel.simpleweb4j.handlers.websocket.WebSocketSession;
+
+import java.io.IOException;
 
 import static fr.ybonnel.simpleweb4j.SimpleWeb4j.start;
 import static fr.ybonnel.simpleweb4j.SimpleWeb4j.websocket;
@@ -37,8 +40,14 @@ public class Main {
         websocket("/chat/:name", Main::buildListenner);
     }
 
-    private static WebSocketListener<String, String> buildListenner(RouteParameters routeParameters) {
-        return WebSocketListener.<String, String>newBuilder(String.class)
+    private static WebSocketListener<String, Message> buildListenner(RouteParameters routeParameters) {
+        return WebSocketListener.<String, Message>newBuilder(String.class)
+                .onMessage((session, message) -> {
+                    try {
+                        session.sendMessage(new Message(routeParameters.getParam("name"), message));
+                    } catch (IOException ignore) {
+                    }
+                })
                 .build();
     }
 }
