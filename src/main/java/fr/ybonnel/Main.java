@@ -16,7 +16,12 @@
  */
 package fr.ybonnel;
 
+
+import fr.ybonnel.simpleweb4j.handlers.RouteParameters;
+import fr.ybonnel.simpleweb4j.handlers.websocket.WebSocketListener;
+
 import static fr.ybonnel.simpleweb4j.SimpleWeb4j.start;
+import static fr.ybonnel.simpleweb4j.SimpleWeb4j.websocket;
 
 public class Main {
 
@@ -29,6 +34,11 @@ public class Main {
 
 
     public static void routes() {
+        websocket("/chat/:name", Main::buildListenner);
+    }
 
+    private static WebSocketListener<String, String> buildListenner(RouteParameters routeParameters) {
+        return WebSocketListener.<String, String>newBuilder(String.class)
+                .build();
     }
 }
