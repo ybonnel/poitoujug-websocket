@@ -22,6 +22,8 @@ import fr.ybonnel.simpleweb4j.handlers.websocket.WebSocketListener;
 import fr.ybonnel.simpleweb4j.handlers.websocket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import static fr.ybonnel.simpleweb4j.SimpleWeb4j.start;
 import static fr.ybonnel.simpleweb4j.SimpleWeb4j.websocket;
@@ -35,19 +37,26 @@ public class Main {
     }
 
 
-
     public static void routes() {
         websocket("/chat/:name", Main::buildListenner);
     }
 
+    private static Set<WebSocketSession<Message>> sessionOpenned = new HashSet<>();
+
     private static WebSocketListener<String, Message> buildListenner(RouteParameters routeParameters) {
         return WebSocketListener.<String, Message>newBuilder(String.class)
-                .onMessage((session, message) -> {
-                    try {
-                        session.sendMessage(new Message(routeParameters.getParam("name"), message));
-                    } catch (IOException ignore) {
-                    }
-                })
+                .onConnect(sessionOpenned::add)
+                .onClose(sessionOpenned::remove)
+                .onMessage(text -> sendMessageToAllSession(new Message(routeParameters.getParam("name"), text)))
                 .build();
+    }
+
+    private static void sendMessageToAllSession(Message message) {
+        sessionOpenned.forEach(session -> {
+            try {
+                session.sendMessage(message);
+            } catch (IOException ignore) {
+            }
+        });
     }
 }

@@ -1,6 +1,7 @@
 package fr.ybonnel;
 
 import fr.ybonnel.simpleweb4j.handlers.ContentType;
+import org.assertj.core.groups.Tuple;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
@@ -106,6 +107,49 @@ public class WebSocketTest {
 
     @Test
     public void canTalkWithOtherPeople() throws Exception {
-        // TODO must do some tests
+        List<Message> messagesUser1 = new ArrayList<>();
+        List<Message> messagesUser2 = new ArrayList<>();
+
+
+        Session session1 = openSession("user1", messagesUser1::add);
+        Session session2 = openSession("user2", messagesUser2::add);
+
+        assertThat(session1).isNotNull();
+        assertThat(session1.isOpen()).isTrue();
+
+        assertThat(session2).isNotNull();
+        assertThat(session2.isOpen()).isTrue();
+
+        session1.getRemote().sendString("\"Hello user2\"");
+
+        await().until(messagesUser1::size, equalTo(1));
+        await().until(messagesUser2::size, equalTo(1));
+
+
+        session2.getRemote().sendString("\"Hello user1\"");
+
+        await().until(messagesUser1::size, equalTo(2));
+        await().until(messagesUser2::size, equalTo(2));
+
+        session1.close();
+
+        await().until(session1::isOpen, is(false));
+
+        session2.getRemote().sendString("\"I'm alone\"");
+
+        await().until(messagesUser2::size, equalTo(3));
+
+        session2.close();
+
+        await().until(session2::isOpen, is(false));
+
+        assertThat(messagesUser1).extracting("user", "text").containsExactly(
+                Tuple.tuple("user1", "Hello user2"),
+                Tuple.tuple("user2", "Hello user1"));
+
+        assertThat(messagesUser2).extracting("user", "text").containsExactly(
+                Tuple.tuple("user1", "Hello user2"),
+                Tuple.tuple("user2", "Hello user1"),
+                Tuple.tuple("user2", "I'm alone"));
     }
 }
