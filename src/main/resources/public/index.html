@@ -7,14 +7,14 @@
           href="webjars/bootstrap/3.0.3/css/bootstrap.min.css">
 
 </head>
-<body >
+<body ng-app="app">
 <div class="text-center">
     <h1>SimpleWeb4j Chat</h1>
 </div>
 
-<div >
+<div ng-controller="ChatCtrl">
     <!-- Partie login, affichée seulement si l'utilisateur n'est pas loggé -->
-    <div class="row" >
+    <div class="row" ng-show="!loggedIn">
         <div class="well col-md-4 col-md-offset-4">
             <form role="form">
                 <div class="form-group">
@@ -23,53 +23,45 @@
                            placeholder="Enter pseudo" ng-model="userTmp">
                 </div>
                 <button type="submit" class="btn btn-default"
-                        >Login</button>
+                        ng-click="login(userTmp)">Login</button>
             </form>
         </div>
     </div>
 
     <!-- Formulaire pour l'envoi de message,
     affiché seulement si l'utilisateur est loggé -->
-    <div class="row" >
+    <div class="row" ng-show="loggedIn">
         <div class="well col-md-4 col-md-offset-4 text-center">
             <form class="form-inline" role="form">
                 <div class="form-group">
                     <input id="message" type="text" class="form-control"
+                           ng-model="message"
                            placeholder="Say hello!" />
                 </div>
                 <button type="submit" class="btn btn-default"
-                        >Post</button>
+                        ng-click="sendMessage()">Post</button>
             </form>
         </div>
     </div>
 
     <!-- Table où sont affichés les messages,
     affichée seulement si l'utilisateur est loggé -->
-    <div class="row" >
+    <div class="row" ng-show="loggedIn">
         <div class="well col-md-4 col-md-offset-4">
             <div class="row text-right">
-                <button class="btn btn-default" >Logout</button>
+                <button class="btn btn-default" ng-click="logout()">Logout</button>
             </div>
             <div class="row" style="margin:10px">
                 <table class="table table-bordered table-condensed
                               table-hover table-striped">
-                    <tr>
+                    <tr ng-repeat="message in messages">
                         <td>
-                            <b>User 1</b><br/>
+                            <b>{{message.user}}</b><br/>
                             <small>
-                                20/11/2014 13:37:42.666
+                                {{message.date | date : 'dd/MM/yyyy HH:mm:ss.sss'}}
                             </small>
                         </td>
-                        <td>Hello</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <b>User 2</b><br/>
-                            <small>
-                                20/11/2014 13:39:42.666
-                            </small>
-                        </td>
-                        <td>Hello</td>
+                        <td>{{message.text}}</td>
                     </tr>
                 </table>
             </div>
@@ -80,6 +72,44 @@
 <script type="text/javascript" src="webjars/angularjs/1.2.8/angular.js"></script>
 <script>
 
+    var app = angular.module("app", []);
+    app.controller('ChatCtrl', function ($scope, $timeout) {
+        $scope.loggedIn = false;
+        $scope.messages = [];
+
+        $scope.login = function(userTmp) {
+            $scope.user = userTmp;
+
+
+            $scope.ws = new WebSocket("ws://localhost:9999/chat/" + $scope.user);
+
+            $scope.ws.onmessage = function (message) {
+                $scope.$apply(function () {
+                    $scope.messages.unshift(JSON.parse(message.data));
+                });
+            };
+
+            $scope.ws.onopen = function () {
+                $scope.ws.send(JSON.stringify("connected"));
+            };
+
+            $scope.loggedIn = true;
+        };
+
+        $scope.logout = function() {
+            $scope.ws.send(JSON.stringify("disconnected"));
+            $timeout(function () {
+                $scope.ws.close();
+                $scope.loggedIn = false;
+            })
+        };
+
+        $scope.sendMessage = function() {
+            $scope.ws.send(JSON.stringify($scope.message));
+            $scope.message = '';
+        }
+
+    });
 </script>
 </body>
 </html>
