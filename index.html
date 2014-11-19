@@ -1,0 +1,526 @@
+﻿<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>SimpleWeb4j - WebSockets</title>
+
+        <meta name="author" content="Yan Bonnel">
+
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <style type="text/css">
+            .footer {
+                display:block;
+                position:absolute;
+                bottom:0;
+                width: 100%;
+                font-size: 22px;
+                text-align: center;
+                color:white;
+            }
+            .invisible {
+                display:none;
+            }
+        </style>
+
+        <link rel="stylesheet" href="css/reveal.min.css">
+        <link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+        <!-- For syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!-- If the query includes 'print-pdf', use the PDF print sheet -->
+        <script>
+            document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+        </script>
+
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+
+        <div class="reveal">
+            <div class="slides">
+                <section>
+                    <h2>WebSockets avec SimpleWeb4j</h2>
+                    <h3>Yan Bonnel</h3>
+                </section>
+                <section>
+                    <section>
+                        <h2>&lt;me&gt;</h2>
+                    </section>
+                    <section>
+                        <p>Développeur Java chez Cegedim<br/><br/></p>
+                        <p>Développeur Android la nuit :</p>
+                        <ul>
+                            <li>
+                                <img src="img/transports-rennes.png"
+                                     width="30" height="30"
+                                     style="margin:0">
+                                <a href="https://play.google.com/store/apps/details?id=fr.ybo.transportsrennes">
+                                     Transports Rennes
+                                </a>
+                            </li>
+                            <li>
+                                <img src="img/transports-bordeaux.png"
+                                     width="30" height="30"
+                                     style="margin:0">
+                                <a href="https://play.google.com/store/apps/details?id=fr.ybo.transportsbordeaux">
+                                    Transports Bordeaux
+                                </a>
+                            </li>
+                            <li>
+                                <img src="img/ybo-tv.png"
+                                     width="30" height="30"
+                                     style="margin:0">
+                                <a href="https://play.google.com/store/apps/details?id=fr.ybo.ybotv.android">
+                                    YboTv
+                                </a>
+                            </li>
+                        </ul>
+                    </section>
+                    <section>
+                        <p>Développeur open-source :</p>
+                        <ul>
+                            <li>
+                                <a href="https://github.com/ybonnel/CsvEngine">CsvEngine</a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/ybonnel/SimpleWeb4j">SimpleWeb4j</a>
+                            </li>
+                        </ul>
+                    </section>
+                    <section>
+                        <p>Où me trouver?</p>
+                        <ul>
+                            <li>Twitter : <a href="https://twitter.com/ybonnel">@ybonnel</a></li>
+                            <li>Github : <a href="https://github.com/ybonnel">ybonnel</a></li>
+                            <li>Blog : <a href="http://www.ybonnel.fr">www.ybonnel.fr</a></li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2>&lt;/me&gt;</h2>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Application Démo</h2>
+                        <p>Une chatroom</p>
+                        <p class="fragment" style="font-size:18px">Quelle originalité!</p>
+                    </section>
+                    <section>
+                        <h3>Technologies utilisées :</h3>
+                        <p class="fragment">WebSockets</p>
+                        <p class="fragment">Java8 : Lambda et Stream</p>
+                        <p class="fragment">Angular.js</p>
+                        <p class="fragment">SimpleWeb4j</p>
+                    </section>
+                    <section>
+                        <h3>Aproche :</h3>
+                        <p class="fragment">TDD pour le backend</p>
+                        <p class="fragment">Travail à partir d'une maquette pour le front</p>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Premier test</h2>
+                        <div>On doit pouvoir se connecter à ws://localhost:9999/chat/monNom</div>
+                    </section>
+                    <section>
+                        <p>Test</p>
+                        <pre class="fragment"><code class="java">@Test
+public void canConnect() throws Exception {
+    // Nom du user.
+    String name = "user";
+    // Connection
+    Session session = client.connect(new WebSocketAdapter() {},
+            new URI("ws://localhost:" + port + "/chat/" + name)).get();
+    // Vérification
+    assertThat(session).isNotNull();
+    assertThat(session.isOpen()).isTrue();
+    // Fermeture de la session
+    session.close();
+    // Attente de fermeture
+    await().until(session::isOpen, is(false));
+}</code></pre>
+                    </section>
+                    <section>
+                        <p>Implémentation</p>
+                        <pre class="fragment"><code class="java">public class Main {
+    public static void main(String[] args) {
+        routes();
+        start();
+    }
+ 
+    public static void routes() {
+        // Route de la WebSocket.
+        websocket("/chat/:name", Main::buildListenner);
+    }
+ 
+    private static WebSocketListener&lt;String, String&gt; buildListenner(
+            RouteParameters routeParameters) {
+        return WebSocketListener.&lt;String, String&gt;newBuilder(String.class)
+                .build();
+    }
+ }</code></pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Second test</h2>
+                        <div>On doit pouvoir parler tout seul</div>
+                    </section>
+                    <section>
+                        <p>POJO</p>
+                        <pre class="fragment"><code class="java">public class Message {
+    public String user;
+    public String text;
+    public Date date;
+
+    public Message(String user, String text) {
+        this.user = user;
+        this.text = text;
+        this.date = new Date();
+    }
+}</code></pre>
+                    </section>
+                    <section>
+                        <p>Test</p>
+                        <pre class="fragment" data-fragment-index="1"><code class="java">private Session openSession(String name, Consumer&lt;Message&gt; c) {
+    return client.connect(new WebSocketAdapter() {
+        @Override
+        public void onWebSocketText(String message) {
+            c.accept(ContentType.GSON.fromJson(message, Message.class));
+        }
+    },new URI("ws://localhost:" + port + "/chat/" + name)).get();
+}</code></pre>
+                        <pre class="fragment" data-fragment-index="1"><code class="java">@Test
+public void canTalkWithMyself() throws Exception {
+    List&lt;Message&gt; messages = new ArrayList&lt;&gt;();
+    Session session = openSession("user", messages::add);
+
+    assertThat(session).isNotNull();
+    assertThat(session.isOpen()).isTrue();
+
+    session.getRemote().sendString("\"i'm alone\"");
+
+    await().until(messages::size, equalTo(1));
+    assertThat(messages.get(0)).isEqualToIgnoringGivenFields(
+        new Message("user", "i'm alone"), "date");
+
+    session.close();
+    await().until(session::isOpen, is(false));
+}</code></pre>
+                    </section>
+                    <section>
+                        <p>Implémentation</p>
+                        <pre class="fragment"><code class="java">
+public static void routes() {
+    websocket("/chat/:name", Main::buildListenner);
+}
+
+private static WebSocketListener&lt;String, Message&gt; buildListenner(
+        RouteParameters routeParameters) {
+    return WebSocketListener.&lt;String, Message&gt;newBuilder(String.class)
+            .onMessage((session, message) -> {
+                try {
+                    session.sendMessage(new Message(
+                        routeParameters.getParam("name"), message));
+                } catch (IOException ignore) {
+                }
+            }).build();
+}</code></pre>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Troisième test</h2>
+                        <div>On doit pouvoir parler à plusieurs</div>
+                    </section>
+                    <section>
+                        <p>Test</p>
+                        <pre class="fragment" style="font-size:11px"><code class="java">List&lt;Message&gt; messagesUser1 = new ArrayList&lt;&gt;();
+List&lt;Message&gt; messagesUser2 = new ArrayList&lt;&gt;();
+Session session1 = openSession("user1", messagesUser1::add);
+Session session2 = openSession("user2", messagesUser2::add);
+
+session1.getRemote().sendString("\"Hello user2\"");
+await().until(messagesUser1::size, equalTo(1));
+await().until(messagesUser2::size, equalTo(1));
+
+session2.getRemote().sendString("\"Hello user1\"");
+await().until(messagesUser1::size, equalTo(2));
+await().until(messagesUser2::size, equalTo(2));
+
+session1.close();
+await().until(session1::isOpen, is(false));
+
+session2.getRemote().sendString("\"I'm alone\"");
+await().until(messagesUser2::size, equalTo(3));
+
+session2.close();
+await().until(session2::isOpen, is(false));
+
+assertThat(messagesUser1).extracting("user", "text").containsExactly(
+        Tuple.tuple("user1", "Hello user2"),
+        Tuple.tuple("user2", "Hello user1"));
+
+assertThat(messagesUser2).extracting("user", "text").containsExactly(
+        Tuple.tuple("user1", "Hello user2"),
+        Tuple.tuple("user2", "Hello user1"),
+        Tuple.tuple("user2", "I'm alone"));</code></pre>
+                    </section>
+                    <section>
+                        <p>Implémentation</p>
+                        <pre class="fragment" style="font-size:18px"><code class="java">static Set&lt;WebSocketSession&lt;Message&gt;&gt; sessionOpenned = new HashSet&lt;&gt;();
+
+private static WebSocketListener&lt;String, Message&gt; buildListenner(
+        RouteParameters routeParameters) {
+    return WebSocketListener.&lt;String, Message&gt;newBuilder(String.class)
+            .onConnect(sessionOpenned::add)
+            .onClose(sessionOpenned::remove)
+            .onMessage(text -> sendMessageToAllSession(new Message(
+                    routeParameters.getParam("name"), text))
+            ).build();
+}
+
+private static void sendMessageToAllSession(Message message) {
+    sessionOpenned.forEach(session -> {
+        try {
+            session.sendMessage(message);
+        } catch (IOException ignore) {}
+    });
+}</code></pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>IHM</h2>
+                        <div>En partant d'une maquette</div>
+                    </section>
+                    <section>
+                        <p>Partie login</p>
+                        <pre class="fragment"><code class="xml">&lt;div class="row" &gt;
+  &lt;div class="well col-md-4 col-md-offset-4"&gt;
+      &lt;form role="form"&gt;
+        &lt;div class="form-group"&gt;
+          &lt;label for="pseudo"&gt;Pseudo&lt;/label&gt;
+          &lt;input type="text" class="form-control" id="pseudo" name="pseudo"
+              placeholder="Enter pseudo"&gt;
+        &lt;/div&gt;
+        &lt;button type="submit" class="btn btn-default"
+            &gt;Login&lt;/button&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+                        <pre class="fragment"><code class="xml">&lt;div class="row" ng-show="!loggedIn"&gt;
+  &lt;div class="well col-md-4 col-md-offset-4"&gt;
+      &lt;form role="form"&gt;
+        &lt;div class="form-group"&gt;
+          &lt;label for="pseudo"&gt;Pseudo&lt;/label&gt;
+          &lt;input type="text" class="form-control" id="pseudo" name="pseudo"
+              placeholder="Enter pseudo" ng-model="userTmp"&gt;
+        &lt;/div&gt;
+        &lt;button type="submit" class="btn btn-default"
+            ng-click="login(userTmp)"&gt;Login&lt;/button&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+                    </section>
+                    <section>
+                        <p>Partie envoi de messages</p>
+                        <pre class="fragment"><code class="xml">&lt;div class="row" &gt;
+  &lt;div class="well col-md-4 col-md-offset-4 text-center"&gt;
+    &lt;form class="form-inline" role="form"&gt;
+      &lt;div class="form-group"&gt;
+        &lt;input id="message" type="text" class="form-control"
+            placeholder="Say hello!" /&gt;
+      &lt;/div&gt;
+      &lt;button type="submit" class="btn btn-default"
+          &gt;Post&lt;/button&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+ &lt;/div&gt;</code></pre>
+                        <pre class="fragment"><code class="xml">&lt;div class="row" ng-show="loggedIn"&gt;
+  &lt;div class="well col-md-4 col-md-offset-4 text-center"&gt;
+    &lt;form class="form-inline" role="form"&gt;
+      &lt;div class="form-group"&gt;
+        &lt;input id="message" type="text" class="form-control"
+            ng-model="message" placeholder="Say hello!" /&gt;
+      &lt;/div&gt;
+      &lt;button type="submit" class="btn btn-default"
+          ng-click="sendMessage()"&gt;Post&lt;/button&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+ &lt;/div&gt;</code></pre>
+                    </section>
+                    <section>
+                        <p>Partie affichage des messages</p>
+                        <pre class="fragment" style="font-size:11px"><code class="xml">&lt;div class="row" &gt;
+  &lt;div class="well col-md-4 col-md-offset-4"&gt;
+    &lt;div class="row text-right"&gt;
+      &lt;button class="btn btn-default" &gt;Logout&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class="row" style="margin:10px"&gt;
+      &lt;table class="table table-bordered table-condensed
+              table-hover table-striped"&gt;
+        &lt;tr&gt;
+          &lt;td&gt;
+            &lt;b&gt;User 1&lt;/b&gt;&lt;br/&gt;
+            &lt;small&gt;20/11/2014 13:37:42.666&lt;/small&gt;
+          &lt;/td&gt;
+          &lt;td&gt;Hello&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+          &lt;td&gt;
+            &lt;b&gt;User 2&lt;/b&gt;&lt;br/&gt;
+            &lt;small&gt;20/11/2014 13:39:42.666&lt;/small&gt;
+          &lt;/td&gt;
+          &lt;td&gt;Hello&lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+                        <pre class="fragment" style="font-size:11px"><code class="xml">&lt;div class="row" ng-show="loggedIn"&gt;
+  &lt;div class="well col-md-4 col-md-offset-4"&gt;
+    &lt;div class="row text-right"&gt;
+      &lt;button class="btn btn-default" ng-click="logout()"&gt;Logout&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class="row" style="margin:10px"&gt;
+      &lt;table class="table table-bordered table-condensed
+              table-hover table-striped"&gt;
+        &lt;tr ng-repeat="message in messages"&gt;
+          &lt;td&gt;
+            &lt;b&gt;{{message.user}}&lt;/b&gt;&lt;br/&gt;
+            &lt;small&gt;
+              {{message.date | date : 'dd/MM/yyyy HH:mm:ss.sss'}}
+            &lt;/small&gt;
+          &lt;/td&gt;
+          &lt;td&gt;{{message.text}}&lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+                    </section>
+                    <section>
+                        <p>Code javascript</p>
+                        <pre class="fragment" style="font-size:11px"><code class="javascript">app.controller('ChatCtrl', function ($scope, $timeout) {
+    $scope.loggedIn = false;
+    $scope.messages = [];
+    $scope.login = function(userTmp) {
+        $scope.user = userTmp;
+        $scope.ws = new WebSocket("ws://localhost:9999/chat/" + $scope.user);
+        $scope.ws.onmessage = function (message) {
+            $scope.$apply(function () {
+                $scope.messages.unshift(JSON.parse(message.data));
+            });
+        };
+        $scope.ws.onopen = function () {
+            $scope.ws.send(JSON.stringify("connected"));
+        };
+        $scope.loggedIn = true;
+    };
+
+    $scope.logout = function() {
+        $scope.ws.send(JSON.stringify("disconnected"));
+        $timeout(function () {
+            $scope.ws.close();
+            $scope.loggedIn = false;
+        })
+    };
+
+    $scope.sendMessage = function() {
+        $scope.ws.send(JSON.stringify($scope.message));
+        $scope.message = '';
+    }
+});</code></pre>
+                    </section>
+                </section>
+                <section>
+                    <h1>Questions?</h1>
+                </section>
+                <section>
+                    <h2>Liens :</h2>
+                    <ul>
+                        <li>SimpleWeb4j : <a href="https://github.com/ybonnel/SimpleWeb4j">ybonnel/SimpleWeb4j</a></li>
+                        <li>Slides : <a href="http://ybonnel.github.io/poitoujug-websocket">ybonnel.github.io/poitoujug-websocket</a></li>
+                        <li>Démo : <a href="https://github.com/ybonnel/poitoujug-websocket">ybonnel/poitoujug-websocket</a></li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p class="note slide2 invisible">step0</p>
+            <p class="note slide3 invisible">step1</p>
+            <p class="note slide4 invisible">step2</p>
+            <p class="note slide5 invisible">step3</p>
+            <p class="note slide6 invisible">step4</p>
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.min.js"></script>
+
+        <div style="display:block;position:absolute;bottom:0;left:0;margin:25px">
+            <img src="img/logo_poitoucharentesjug.png"/>
+        </div>
+
+        <script>
+
+            // Full list of configuration options available here:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+
+                theme: Reveal.getQueryHash().theme || 'default', // available themes are in /css/theme
+                transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+                // Optional libraries used to extend on reveal.js
+                dependencies: [
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+                    { src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+                    // { src: 'plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; } }
+                    // { src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+                ]
+            });
+
+            function changeNote(slideNum) {
+                var notes = document.querySelectorAll(".note");
+                for (var i = 0; i < notes.length; i++) {
+                    notes[i].classList.add("invisible");
+                }
+                if (document.querySelector(".slide" + slideNum)) {
+                    document.querySelector(".slide" + slideNum).classList.remove("invisible");
+                }
+            }
+
+
+            Reveal.addEventListener( 'ready', function( event ) {
+                changeNote(event.indexh);
+            } );
+
+            Reveal.addEventListener( 'slidechanged', function( event ) {
+                changeNote(event.indexh);
+            } );
+
+        </script>
+
+    </body>
+</html>
