@@ -123,7 +123,7 @@
                         <p class="fragment">SimpleWeb4j</p>
                     </section>
                     <section>
-                        <h3>Aproche :</h3>
+                        <h3>Approche :</h3>
                         <p class="fragment">TDD pour le backend</p>
                         <p class="fragment">Travail à partir d'une maquette pour le front</p>
                     </section>
@@ -280,20 +280,20 @@ assertThat(messagesUser2).extracting("user", "text").containsExactly(
                     </section>
                     <section>
                         <p>Implémentation</p>
-                        <pre class="fragment" style="font-size:18px"><code class="java">static Set&lt;WebSocketSession&lt;Message&gt;&gt; sessionOpenned = new HashSet&lt;&gt;();
+                        <pre class="fragment" style="font-size:18px"><code class="java">static Set&lt;WebSocketSession&lt;Message&gt;&gt; sessionOpened = new HashSet&lt;&gt;();
 
 private static WebSocketListener&lt;String, Message&gt; buildListenner(
         RouteParameters routeParameters) {
     return WebSocketListener.&lt;String, Message&gt;newBuilder(String.class)
-            .onConnect(sessionOpenned::add)
-            .onClose(sessionOpenned::remove)
+            .onConnect(sessionOpened::add)
+            .onClose(sessionOpened::remove)
             .onMessage(text -> sendMessageToAllSession(new Message(
                     routeParameters.getParam("name"), text))
             ).build();
 }
 
 private static void sendMessageToAllSession(Message message) {
-    sessionOpenned.forEach(session -> {
+    sessionOpened.forEach(session -> {
         try {
             session.sendMessage(message);
         } catch (IOException ignore) {}
