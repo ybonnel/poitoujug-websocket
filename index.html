@@ -28,7 +28,7 @@
             }
         </style>
 
-        <link rel="stylesheet" href="css/reveal.min.css">
+        <link rel="stylesheet" href="css/reveal.css">
         <link rel="stylesheet" href="css/theme/default.css" id="theme">
 
         <!-- For syntax highlighting -->
@@ -308,109 +308,59 @@ private static void sendMessageToAllSession(Message message) {
                     </section>
                     <section>
                         <p>Partie login</p>
-                        <pre class="fragment"><code class="xml">&lt;div class="row" &gt;
-  &lt;div class="well col-md-4 col-md-offset-4"&gt;
-      &lt;form role="form"&gt;
-        &lt;div class="form-group"&gt;
-          &lt;label for="pseudo"&gt;Pseudo&lt;/label&gt;
-          &lt;input type="text" class="form-control" id="pseudo" name="pseudo"
-              placeholder="Enter pseudo"&gt;
-        &lt;/div&gt;
-        &lt;button type="submit" class="btn btn-default"
-            &gt;Login&lt;/button&gt;
-    &lt;/form&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</code></pre>
-                        <pre class="fragment"><code class="xml">&lt;div class="row" ng-show="!loggedIn"&gt;
-  &lt;div class="well col-md-4 col-md-offset-4"&gt;
-      &lt;form role="form"&gt;
-        &lt;div class="form-group"&gt;
-          &lt;label for="pseudo"&gt;Pseudo&lt;/label&gt;
-          &lt;input type="text" class="form-control" id="pseudo" name="pseudo"
-              placeholder="Enter pseudo" ng-model="userTmp"&gt;
-        &lt;/div&gt;
-        &lt;button type="submit" class="btn btn-default"
-            ng-click="login(userTmp)"&gt;Login&lt;/button&gt;
-    &lt;/form&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</code></pre>
+                        <pre class="fragment" data-fragment-index="0"><div class="code xml"><span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"row"</span><span class="fragment" data-fragment-index="1"> <span class="attribute">ng-show</span>=<span class="value">"!loggedIn"</span></span>&gt;</span>
+  <span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"well col-md-4 col-md-offset-4"</span>&gt;</span>
+      <span class="tag">&lt;<span class="title">form</span> <span class="attribute">role</span>=<span class="value">"form"</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"form-group"</span>&gt;</span>
+          <span class="tag">&lt;<span class="title">label</span> <span class="attribute">for</span>=<span class="value">"pseudo"</span>&gt;</span>Pseudo<span class="tag">&lt;/<span class="title">label</span>&gt;</span>
+          <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">class</span>=<span class="value">"form-control"</span> <span class="attribute">id</span>=<span class="value">"pseudo"</span> <span class="attribute">name</span>=<span class="value">"pseudo"</span>
+              <span class="attribute">placeholder</span>=<span class="value">"Enter pseudo"</span><span class="fragment" data-fragment-index="1"> <span class="attribute">ng-model</span>=<span class="value">"userTmp"</span></span>&gt;</span>
+        <span class="tag">&lt;/<span class="title">div</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">button</span> <span class="attribute">type</span>=<span class="value">"submit"</span> <span class="attribute">class</span>=<span class="value">"btn btn-default"</span>
+            <span class="fragment" data-fragment-index="1"><span class="attribute">ng-click</span>=<span class="value">"login(userTmp)"</span></span>&gt;</span>Login<span class="tag">&lt;/<span class="title">button</span>&gt;</span>
+    <span class="tag">&lt;/<span class="title">form</span>&gt;</span>
+  <span class="tag">&lt;/<span class="title">div</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">div</span>&gt;</span></div></pre>
                     </section>
                     <section>
                         <p>Partie envoi de messages</p>
-                        <pre class="fragment"><code class="xml">&lt;div class="row" &gt;
-  &lt;div class="well col-md-4 col-md-offset-4 text-center"&gt;
-    &lt;form class="form-inline" role="form"&gt;
-      &lt;div class="form-group"&gt;
-        &lt;input id="message" type="text" class="form-control"
-            placeholder="Say hello!" /&gt;
-      &lt;/div&gt;
-      &lt;button type="submit" class="btn btn-default"
-          &gt;Post&lt;/button&gt;
-    &lt;/form&gt;
-  &lt;/div&gt;
- &lt;/div&gt;</code></pre>
-                        <pre class="fragment"><code class="xml">&lt;div class="row" ng-show="loggedIn"&gt;
-  &lt;div class="well col-md-4 col-md-offset-4 text-center"&gt;
-    &lt;form class="form-inline" role="form"&gt;
-      &lt;div class="form-group"&gt;
-        &lt;input id="message" type="text" class="form-control"
-            ng-model="message" placeholder="Say hello!" /&gt;
-      &lt;/div&gt;
-      &lt;button type="submit" class="btn btn-default"
-          ng-click="sendMessage()"&gt;Post&lt;/button&gt;
-    &lt;/form&gt;
-  &lt;/div&gt;
- &lt;/div&gt;</code></pre>
+                        <pre class="fragment" data-fragment-index="0"><div class=".xml"><span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"row"</span><span class="fragment" data-fragment-index="1"> <span class="attribute">ng-show</span>=<span class="value">"loggedIn"</span></span>&gt;</span>
+  <span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"well col-md-4 col-md-offset-4 text-center"</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">form</span> <span class="attribute">class</span>=<span class="value">"form-inline"</span> <span class="attribute">role</span>=<span class="value">"form"</span>&gt;</span>
+      <span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"form-group"</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">input</span> <span class="attribute">id</span>=<span class="value">"message"</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">class</span>=<span class="value">"form-control"</span>
+           <span class="fragment" data-fragment-index="1"> <span class="attribute">ng-model</span>=<span class="value">"message"</span></span> <span class="attribute">placeholder</span>=<span class="value">"Say hello!"</span> /&gt;</span>
+      <span class="tag">&lt;/<span class="title">div</span>&gt;</span>
+      <span class="tag">&lt;<span class="title">button</span> <span class="attribute">type</span>=<span class="value">"submit"</span> <span class="attribute">class</span>=<span class="value">"btn btn-default"</span>
+          <span class="fragment" data-fragment-index="1"><span class="attribute">ng-click</span>=<span class="value">"sendMessage()"</span></span>&gt;</span>Post<span class="tag">&lt;/<span class="title">button</span>&gt;</span>
+    <span class="tag">&lt;/<span class="title">form</span>&gt;</span>
+  <span class="tag">&lt;/<span class="title">div</span>&gt;</span>
+ <span class="tag">&lt;/<span class="title">div</span>&gt;</span></div></pre>
                     </section>
                     <section>
                         <p>Partie affichage des messages</p>
-                        <pre class="fragment" style="font-size:11px"><code class="xml">&lt;div class="row" &gt;
-  &lt;div class="well col-md-4 col-md-offset-4"&gt;
-    &lt;div class="row text-right"&gt;
-      &lt;button class="btn btn-default" &gt;Logout&lt;/button&gt;
-    &lt;/div&gt;
-    &lt;div class="row" style="margin:10px"&gt;
-      &lt;table class="table table-bordered table-condensed
-              table-hover table-striped"&gt;
-        &lt;tr&gt;
-          &lt;td&gt;
-            &lt;b&gt;User 1&lt;/b&gt;&lt;br/&gt;
-            &lt;small&gt;20/11/2014 13:37:42.666&lt;/small&gt;
-          &lt;/td&gt;
-          &lt;td&gt;Hello&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-          &lt;td&gt;
-            &lt;b&gt;User 2&lt;/b&gt;&lt;br/&gt;
-            &lt;small&gt;20/11/2014 13:39:42.666&lt;/small&gt;
-          &lt;/td&gt;
-          &lt;td&gt;Hello&lt;/td&gt;
-        &lt;/tr&gt;
-      &lt;/table&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</code></pre>
-                        <pre class="fragment" style="font-size:11px"><code class="xml">&lt;div class="row" ng-show="loggedIn"&gt;
-  &lt;div class="well col-md-4 col-md-offset-4"&gt;
-    &lt;div class="row text-right"&gt;
-      &lt;button class="btn btn-default" ng-click="logout()"&gt;Logout&lt;/button&gt;
-    &lt;/div&gt;
-    &lt;div class="row" style="margin:10px"&gt;
-      &lt;table class="table table-bordered table-condensed
-              table-hover table-striped"&gt;
-        &lt;tr ng-repeat="message in messages"&gt;
-          &lt;td&gt;
-            &lt;b&gt;{{message.user}}&lt;/b&gt;&lt;br/&gt;
-            &lt;small&gt;
-              {{message.date | date : 'dd/MM/yyyy HH:mm:ss.sss'}}
-            &lt;/small&gt;
-          &lt;/td&gt;
-          &lt;td&gt;{{message.text}}&lt;/td&gt;
-        &lt;/tr&gt;
-      &lt;/table&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</code></pre>
+                        <pre class="fragment" style="font-size:18px" data-fragment-index="0"><div class="xml"><span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"row"</span> <span class="fragment" data-fragment-index="1"><span class="attribute">ng-show</span>=<span class="value">"loggedIn"</span></span>&gt;</span>
+  <span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"well col-md-4 col-md-offset-4"</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"row text-right"</span>&gt;</span>
+      <span class="tag">&lt;<span class="title">button</span> <span class="attribute">class</span>=<span class="value">"btn btn-default"</span> <span class="attribute">ng-click</span>=<span class="value">"logout()"</span>&gt;</span>Logout<span class="tag">&lt;/<span class="title">button</span>&gt;</span>
+    <span class="tag">&lt;/<span class="title">div</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"row"</span> <span class="attribute">style</span>=<span class="value">"margin:10px"</span>&gt;</span>
+      <span class="tag">&lt;<span class="title">table</span> <span class="attribute">class</span>=<span class="value">"table table-bordered table-condensed
+              table-hover table-striped"</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">tr</span> <span class="fragment" data-fragment-index="1"><span class="attribute">ng-repeat</span>=<span class="value">"message in messages"</span></span>&gt;</span>
+          <span class="tag">&lt;<span class="title">td</span>&gt;</span>
+            <span class="fragment fade-out" data-fragment-index="1"><span class="tag">&lt;<span class="title">b</span>&gt;</span>Nom user<span class="tag">&lt;/<span class="title">b</span>&gt;</span><span class="tag">&lt;<span class="title">br</span>/&gt;</span></span>
+            <span class="fragment roll-in" data-fragment-index="1"><span class="tag">&lt;<span class="title">b</span>&gt;</span>{{message.user}}<span class="tag">&lt;/<span class="title">b</span>&gt;</span><span class="tag">&lt;<span class="title">br</span>/&gt;</span></span>
+            <span class="fragment fade-out" data-fragment-index="1"><span class="tag">&lt;<span class="title">small</span>&gt;</span>27/11/2014 13:37:42.666<span class="tag">&lt;/<span class="title">small</span>&gt;</span></span>
+            <span class="fragment roll-in" data-fragment-index="1"><span class="tag">&lt;<span class="title">small</span>&gt;</span>{{message.date | date : 'dd/MM/yyyy HH:mm:ss.sss'}}<span class="tag">&lt;/<span class="title">small</span>&gt;</span></span>
+          <span class="tag">&lt;/<span class="title">td</span>&gt;</span>
+          <span class="fragment fade-out" data-fragment-index="1"><span class="tag">&lt;<span class="title">td</span>&gt;</span>coucou<span class="tag">&lt;/<span class="title">td</span>&gt;</span></span>
+          <span class="fragment roll-in" data-fragment-index="1"><span class="tag">&lt;<span class="title">td</span>&gt;</span>{{message.text}}<span class="tag">&lt;/<span class="title">td</span>&gt;</span></span>
+        <span class="tag">&lt;/<span class="title">tr</span>&gt;</span>
+      <span class="tag">&lt;/<span class="title">table</span>&gt;</span>
+    <span class="tag">&lt;/<span class="title">div</span>&gt;</span>
+  <span class="tag">&lt;/<span class="title">div</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">div</span>&gt;</span></div></pre>
                     </section>
                     <section>
                         <p>Code javascript</p>
@@ -454,7 +404,7 @@ private static void sendMessageToAllSession(Message message) {
                     <ul>
                         <li>SimpleWeb4j : <a href="https://github.com/ybonnel/SimpleWeb4j">ybonnel/SimpleWeb4j</a></li>
                         <li>Slides : <a href="http://ybonnel.github.io/poitoujug-websocket">ybonnel.github.io/poitoujug-websocket</a></li>
-                        <li>Code : <a href="https://github.com/ybonnel/poitoujug-websocket">ybonnel/poitoujug-websocket</a></li>
+                        <li>Démo : <a href="https://github.com/ybonnel/poitoujug-websocket">ybonnel/poitoujug-websocket</a></li>
                     </ul>
                 </section>
             </div>
